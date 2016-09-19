@@ -9,8 +9,6 @@
   canvas.height = CANVAS_HEIGHT;
   const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
 
-  window.ctx = ctx; // for debug
-
   class Point2d {
 
     public x;
@@ -35,35 +33,26 @@
     private queue: Array<Function> = [];
     private isDrawable: boolean = true;
 
-    public constructor(posX : number, posY : number, ctx : CanvasRenderingContext2D) {
-      this.posX = posX;
-      this.posY = posY;
+    public constructor(ctx : CanvasRenderingContext2D) {
       this.ctx = ctx;
-
-      let width = this.ctx.canvas.width;
-      let height = this.ctx.canvas.height;
-      this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-      this.origin.x = width / 2;
-      this.origin.y = height / 2;
-    }
-
-    private resetCanvas() {
-      let width = this.ctx.canvas.width;
-      let height = this.ctx.canvas.height;
-      this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+      this.origin.x = CANVAS_WIDTH / 2;
+      this.origin.y = CANVAS_HEIGHT / 2;
+      this.posX = this.origin.x;
+      this.posY = this.origin.y;
     }
 
     public run() {
 
-      this.resetCanvas();
-
+      this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       this.posX = this.origin.x;
       this.posY = this.origin.y;
       this.ctx.moveTo(this.posX, this.posY);
 
-      this.queue.forEach(function(command) {
-        command();
-      });
+      const stackSize = this.queue.length;
+      console.log('command stack size: ', stackSize);
+      for (let i = 0; i < stackSize; ++i) {
+        this.dequeue()();
+      }
 
       console.log('--- finish exec command, stroke it ---');
       this.ctx.stroke();
@@ -74,11 +63,15 @@
     }
 
     private transformY(y : number) : number {
-      return this.posY + y;
+      return this.posY - y;
     }
 
     public enqueue(func) {
       this.queue.push(func);
+    }
+
+    public dequeue() : Function {
+      return this.queue.shift();
     }
 
     public setDrawableTo(isDrawable : boolean) : void {
@@ -134,21 +127,21 @@
       console.log('--- input command: pen down ---');
       this.handler.enqueue(this.handler.setDrawableTo.bind(this.handler, true));
     }
-    public FD(length : number) {
+    public FD(length : string) {
       console.log('--- input command: forward ---');
-      this.handler.enqueue(this.handler.moveForward.bind(this.handler, length));
+      this.handler.enqueue(this.handler.moveForward.bind(this.handler, parseInt(length, 10)));
     }
-    public BK(length : number) {
+    public BK(length : string) {
       console.log('--- input command: backward ---');
-      this.handler.enqueue(this.handler.moveBackward.bind(this.handler, length));
+      this.handler.enqueue(this.handler.moveBackward.bind(this.handler, parseInt(length, 10)));
     }
-    public RT(degree : number) {
+    public RT(degree : string) {
       console.log('--- input command: rotate right ---');
-      this.handler.enqueue(this.handler.rotateRight.bind(this.handler, degree));
+      this.handler.enqueue(this.handler.rotateRight.bind(this.handler, parseInt(degree, 10)));
     }
-    public LT(degree : number) {
+    public LT(degree : string) {
       console.log('--- input command: rotate left ---');
-      this.handler.enqueue(this.handler.rotateLeft.bind(this.handler, degree));
+      this.handler.enqueue(this.handler.rotateLeft.bind(this.handler, parseInt(degree, 10)));
     }
     public static getCommandName(str) {
       return str.replace(INPUT_PARSE_REGEXP, "$1");
@@ -163,7 +156,7 @@
 
   button.addEventListener('click', function(e) {
 
-    const canvasHandler = new CanvasHandler(canvas.width/2, canvas.height/2, ctx);
+    const canvasHandler = new CanvasHandler(ctx);
     const inputHandler = new InputHandler(canvasHandler);
 
     const inputs = textarea.value;
@@ -181,8 +174,6 @@
       } catch (e) {
         console.warn(e.name);
         console.warn(e.message);
-        console.warn(commandName);
-        console.warn(commandArgs);
       }
     });
 
