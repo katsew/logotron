@@ -1,2 +1,5 @@
 node_modules
 /dist
+
+assets/js/*.js
+assets/js/*.map
