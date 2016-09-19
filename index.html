@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Electron boilerplate</title>
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    <div class="container clearfix" id="container">
+      <canvas class="main" id="c"></canvas>
+      <textarea
+        id="editCommand"
+        class="command"
+        placeholder="> ...Enter command then click RUN to draw turtule graphics!
+PU() - not draw until run PD 
+PD() - start draw line
+FD(num) - go forward (num) length
+BK(num) - go back (num) length
+RT(num) - turn right (num) degree
+LT(num) turn left (num) degree
+        "
+      ></textarea>
+      <button id="buttonRun" class="button">RUN</button>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
