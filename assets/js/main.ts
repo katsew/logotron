@@ -20,6 +20,28 @@
 
   }
 
+  const TURTLE_IMG_WIDTH = 30;
+  const TURTLE_IMG_HEIGHT = 30;
+  const TURTLE_IMG_PATH = 'assets/image/kame.png';
+  class Turtle {
+
+    private ctx : CanvasRenderingContext2D;
+    public constructor(ctx: CanvasRenderingContext2D) {
+      this.ctx = ctx;
+      const img = new Image();
+      img.src = TURTLE_IMG_PATH;
+
+      let self = this;
+      console.log(self);
+      img.onload = function(e) {
+        let posX = (CANVAS_WIDTH / 2) - (TURTLE_IMG_WIDTH / 2);
+        let posY = (CANVAS_HEIGHT / 2) - (TURTLE_IMG_HEIGHT / 2);
+        self.ctx.drawImage(img, posX, posY);
+      };
+    }
+
+  }
+
   class CanvasHandler {
 
     private ctx: CanvasRenderingContext2D = null;
@@ -46,6 +68,7 @@
       this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       this.posX = this.origin.x;
       this.posY = this.origin.y;
+      this.ctx.beginPath();
       this.ctx.moveTo(this.posX, this.posY);
 
       const stackSize = this.queue.length;
@@ -55,7 +78,13 @@
       }
 
       console.log('--- finish exec command, stroke it ---');
-      this.ctx.stroke();
+      this.cleanUp();
+    }
+
+    private cleanUp() {
+      this.posX = this.origin.x;
+      this.posY = this.origin.y;
+      this.degree = 90;
     }
 
     private transformX(x : number) : number {
@@ -82,16 +111,47 @@
     public moveForward(length : number) {
 
       let radian = deg2rad(this.degree);
-      this.posX = this.transformX(Math.cos(radian) * length);
-      this.posY = this.transformY(Math.sin(radian) * length);
+      let unitX = Math.cos(radian);
+      let unitY = Math.sin(radian);
 
-      if (this.isDrawable) {
-        this.ctx.lineTo(this.posX, this.posY);
-      } else {
-        this.ctx.moveTo(this.posX, this.posY);
+      let nextPosX = this.transformX(unitX * length);
+      let nextPosY = this.transformY(unitY * length);
+      console.log('current position: ', this.posX, this.posY);
+      console.log('next position: ', nextPosX, nextPosY);
+      console.log('distance: ', nextPosX - this.posX, nextPosY - this.posY);
+      for (let i = 1; i <= length; ++i) {
+
+        setTimeout(() => {
+          let x;
+          let y;
+          if (this.posX === nextPosX) {
+            x = nextPosX;
+          } else if (nextPosX - this.posX < 0) {
+            x = this.posX - i;
+          } else {
+            x = this.posX + i;
+          }
+          if (this.posY === nextPosY) {
+            y = nextPosY;
+          } else if (nextPosY - this.posY < 0) {
+            y = this.posY - i;
+          } else {
+            y = this.posY + i;
+          }
+
+          if (this.isDrawable) {
+            this.ctx.lineTo(x, y);
+          } else {
+            this.ctx.moveTo(x, y);
+          }
+
+          console.log('move to :', x, y);
+          this.ctx.stroke();
+        }, 100);
+
       }
-
-      console.log('move to :', this.posX, this.posY);
+      this.posX = this.transformX(unitX * length);
+      this.posY = this.transformY(unitY * length);
 
     }
 
@@ -100,7 +160,7 @@
     }
 
     public rotateRight(degree : number) {
-      this.degree = this.degree - degree;
+      this.degree = this.degree === 0 ? 360 - degree : this.degree - degree;
       console.log('rotate right: ', this.degree);
     }
 
@@ -153,12 +213,11 @@
 
   const textarea = <HTMLTextAreaElement>document.getElementById('editCommand');
   const button = <HTMLButtonElement>document.getElementById('buttonRun');
-
+  const turtle = new Turtle(ctx);
+  const canvasHandler = new CanvasHandler(ctx);
   button.addEventListener('click', function(e) {
 
-    const canvasHandler = new CanvasHandler(ctx);
     const inputHandler = new InputHandler(canvasHandler);
-
     const inputs = textarea.value;
     const commands = parseCommands(inputs);
     console.log(commands);
@@ -202,5 +261,12 @@
     return radian;
 
   }
+
+  function main() {
+
+    requestAnimationFrame(main);
+
+  }
+  main();
 
 })();
