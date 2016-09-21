@@ -171,7 +171,7 @@
 
   }
 
-  const INPUT_PARSE_REGEXP = /^(PU|PD|FD|BK|RT|LT)\((.*)\).*$/;
+  const INPUT_COMMAND_REGEXP = /^(PU|PD|FD|BK|RT|LT)\((.*)\).*$/;
   class InputHandler {
 
     private handler: CanvasHandler;
@@ -204,10 +204,10 @@
       this.handler.enqueue(this.handler.rotateLeft.bind(this.handler, parseInt(degree, 10)));
     }
     public static getCommandName(str) {
-      return str.replace(INPUT_PARSE_REGEXP, "$1");
+      return str.replace(INPUT_COMMAND_REGEXP, "$1");
     }
     public static getCommandArgs(str) {
-      return str.replace(INPUT_PARSE_REGEXP, "$2").split(',');
+      return str.replace(INPUT_COMMAND_REGEXP, "$2").split(',');
     }
   }
 
