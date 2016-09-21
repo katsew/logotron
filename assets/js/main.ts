@@ -113,13 +113,16 @@
       let radian = deg2rad(this.degree);
       let unitX = Math.cos(radian);
       let unitY = Math.sin(radian);
+      console.log('unitAxis', unitX, unitY);
 
       let nextPosX = this.transformX(unitX * length);
+      nextPosX = nextPosX === 0 ? this.posX : nextPosX;
       let nextPosY = this.transformY(unitY * length);
+      nextPosY = nextPosY === 0 ? this.posY : nextPosY;
       console.log('current position: ', this.posX, this.posY);
       console.log('next position: ', nextPosX, nextPosY);
       console.log('distance: ', nextPosX - this.posX, nextPosY - this.posY);
-      for (let i = 1; i <= length; ++i) {
+      for (let i = 0.05; i <= length;) {
 
         setTimeout(() => {
           let x;
@@ -147,11 +150,11 @@
 
           console.log('move to :', x, y);
           this.ctx.stroke();
-        }, 100);
-
+        }, 0);
+        i = i + 0.05;
       }
-      this.posX = this.transformX(unitX * length);
-      this.posY = this.transformY(unitY * length);
+      this.posX = nextPosX;
+      this.posY = nextPosY;
 
     }
 
