@@ -5,24 +5,24 @@ export class CodeRunner {
 
   private isExecuting : boolean = false;
   private animationId : number;
+  private boundMainFunc : FrameRequestCallback;
 
   public constructor(queue : ExecQueue) {
     this.callStack = queue;
+    this.boundMainFunc = this.main.bind(this);
     console.log('init code runnder: ', queue.getStackSize());
   }
 
   public run() {
     this.isExecuting = true;
-    this.animationId = requestAnimationFrame(this.main.bind(this));
     this.main();
   }
 
   private main() {
-    console.log('--- looop ----');
 
+    this.animationId = requestAnimationFrame(this.boundMainFunc);
     if (this.callStack.getStackSize() > 0) {
       let func = this.callStack.dequeue();
-      console.log(this.callStack.getStackSize());
       func();
     } else {
       cancelAnimationFrame(this.animationId);
@@ -34,4 +34,5 @@ export class CodeRunner {
   public isRunning() {
     return this.isExecuting;
   }
+  
 }
