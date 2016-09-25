@@ -42,7 +42,6 @@ export class Pen {
 
   public setDrawableTo(isDrawable : boolean) : void {
     this.isDrawable = isDrawable;
-    console.log('set isDrawable to : ', this.isDrawable);
   }
 
   public moveForward(length : number) {
@@ -50,7 +49,6 @@ export class Pen {
     let radian = deg2rad(this.degree);
     let unitX = Math.cos(radian);
     let unitY = Math.sin(radian);
-    console.log('unitAxis', unitX, unitY);
 
     this.posX = this.transformX(unitX * length);
     this.posY = this.transformY(unitY * length);
@@ -69,12 +67,10 @@ export class Pen {
 
   public rotateRight(degree : number) {
     this.degree = this.degree === 0 ? 360 - degree : this.degree - degree;
-    console.log('rotate right: ', this.degree);
   }
 
   public rotateLeft(degree : number) {
     this.degree = this.degree + degree;
-    console.log('rotate left: ', this.degree);
   }
 
 }

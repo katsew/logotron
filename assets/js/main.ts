@@ -19,7 +19,8 @@ const commandHandler = new CommandHandler(pen, turtle, callStack);
 button.addEventListener('click', function(e) {
 
   pen.initialize();
-  
+  turtle.initialize();
+
   const inputs = textarea.value;
   const commands = CommandHandler.parseCommands(inputs);
   console.log(commands);

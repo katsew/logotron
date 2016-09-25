@@ -18,32 +18,35 @@ export class CommandHandler {
     this[command].apply(this, args);
   }
   public PU() {
-    console.log('--- input command: pen up ---');
     this.callStack.enqueue(this.pen.setDrawableTo.bind(this.pen, false));
   }
   public PD() {
-    console.log('--- input command: pen down ---');
     this.callStack.enqueue(this.pen.setDrawableTo.bind(this.pen, true));
   }
   public FD(length : string) {
-    console.log('--- input command: forward ---');
     for (let i = 0; i < Number(length); ++i) {
-      this.callStack.enqueue(this.pen.moveForward.bind(this.pen, i));
+      let callFunc = function() {
+        this.turtle.moveForward.call(this.turtle, i);
+        this.pen.moveForward.call(this.pen, i);
+      }.bind(this);
+      this.callStack.enqueue(callFunc);
     }
   }
   public BK(length : string) {
-    console.log('--- input command: backward ---');
     for (let i = 0; i < Number(length); ++i) {
+      this.callStack.enqueue(this.turtle.moveBackward.bind(this.turtle, i));
       this.callStack.enqueue(this.pen.moveBackward.bind(this.pen, i));
     }
   }
   public RT(degree : string) {
-    console.log('--- input command: rotate right ---');
-    this.callStack.enqueue(this.pen.rotateRight.bind(this.pen, parseInt(degree, 10)));
+    const numberDegree = Number(degree);
+    this.callStack.enqueue(this.pen.rotateRight.bind(this.pen, numberDegree));
+    this.callStack.enqueue(this.turtle.rotateRight.bind(this.turtle, numberDegree));
   }
   public LT(degree : string) {
-    console.log('--- input command: rotate left ---');
-    this.callStack.enqueue(this.pen.rotateLeft.bind(this.pen, parseInt(degree, 10)));
+    const numberDegree = Number(degree);
+    this.callStack.enqueue(this.pen.rotateLeft.bind(this.pen, numberDegree));
+    this.callStack.enqueue(this.turtle.rotateLeft.bind(this.turtle, numberDegree));
   }
   public static getCommandName(str) {
     return str.replace(INPUT_COMMAND_REGEXP, "$1");

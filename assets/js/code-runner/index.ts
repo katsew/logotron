@@ -10,7 +10,6 @@ export class CodeRunner {
   public constructor(queue : ExecQueue) {
     this.callStack = queue;
     this.boundMainFunc = this.main.bind(this);
-    console.log('init code runnder: ', queue.getStackSize());
   }
 
   public run() {
@@ -34,5 +33,5 @@ export class CodeRunner {
   public isRunning() {
     return this.isExecuting;
   }
-  
+
 }
