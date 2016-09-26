@@ -6,18 +6,20 @@ import { CodeRunner } from './code-runner/index';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from './constants/index';
 
 
-const canvas = <HTMLCanvasElement>document.getElementById('c');
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
-const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+const penCanvas = <HTMLCanvasElement>document.getElementById('p');
+const turtleCanvas = <HTMLCanvasElement>document.getElementById('t');
+penCanvas.width = turtleCanvas.width = CANVAS_WIDTH;
+penCanvas.height = turtleCanvas.height = CANVAS_HEIGHT;
+const penCanvasCtx = <CanvasRenderingContext2D>penCanvas.getContext('2d');
+const turtleCanvasCtx = <CanvasRenderingContext2D>turtleCanvas.getContext('2d');
 const textarea = <HTMLTextAreaElement>document.getElementById('editCommand');
 const button = <HTMLButtonElement>document.getElementById('buttonRun');
-const turtle = new Turtle(ctx);
-const pen = new Pen(ctx);
+const turtle = new Turtle(turtleCanvasCtx);
+const pen = new Pen(penCanvasCtx);
 const callStack = new ExecQueue();
 const commandHandler = new CommandHandler(pen, turtle, callStack);
 button.addEventListener('click', function(e) {
-
+  
   pen.initialize();
   turtle.initialize();
 

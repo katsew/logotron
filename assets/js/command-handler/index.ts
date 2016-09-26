@@ -25,11 +25,8 @@ export class CommandHandler {
   }
   public FD(length : string) {
     for (let i = 0; i < Number(length); ++i) {
-      let callFunc = function() {
-        this.turtle.moveForward.call(this.turtle, i);
-        this.pen.moveForward.call(this.pen, i);
-      }.bind(this);
-      this.callStack.enqueue(callFunc);
+      this.callStack.enqueue(this.turtle.moveForward.bind(this.turtle, i));
+      this.callStack.enqueue(this.pen.moveForward.bind(this.pen, i));
     }
   }
   public BK(length : string) {
