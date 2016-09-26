@@ -18,8 +18,12 @@ const turtle = new Turtle(turtleCanvasCtx);
 const pen = new Pen(penCanvasCtx);
 const callStack = new ExecQueue();
 const commandHandler = new CommandHandler(pen, turtle, callStack);
+
+let instance = null;
 button.addEventListener('click', function(e) {
   
+  if (instance != null && instance.isRunning()) { return false; }
+
   pen.initialize();
   turtle.initialize();
 
@@ -44,5 +48,6 @@ button.addEventListener('click', function(e) {
   console.log('--- finish enqueue commands ---');
   const codeRunner = new CodeRunner(callStack);
   codeRunner.run();
+  instance = codeRunner;
 
 }, false);
