@@ -1,4 +1,4 @@
-import { Point2d, deg2rad } from '../utils/index';
+import { Point2d, deg2rad, deg2rot, roundDegree } from '../utils/index';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants/index';
 import * as Debug from 'debug';
 const debug = Debug('Logotron:Turtle');
@@ -57,18 +57,22 @@ export class Turtle {
 
   public moveForward(length : number) {
 
+    debug('------ MOVE FORWARD ------');
     let radian = deg2rad(this.degree);
     let unitX = Math.cos(radian);
     let unitY = Math.sin(radian);
     this.posX = this.transformX(unitX * length);
     this.posY = this.transformY(unitY * length);
-    let translateX = this.posX + TURTLE_IMG_WIDTH;
-    let translateY = this.posY;
+    let translateX = this.posX + this.imgOriginX;
+    let translateY = this.posY + this.imgOriginY;
     this.ctx.save();
 
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     this.ctx.translate(translateX, translateY);
-    this.ctx.rotate(radian);
+    debug('RADIAN: ', this.degree);
+    debug('ANGLE: ', deg2rot(this.degree));
+    let isReverse = this.degree > 0;
+    this.ctx.rotate(deg2rot(this.degree, isReverse));
     this.ctx.translate(-translateX, -translateY);
     this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
 
@@ -83,34 +87,37 @@ export class Turtle {
   public rotateRight(degree : number) {
 
     debug('------ ROTATE RIGHT ------');
-    this.degree = this.degree === 0 ? 360 - degree : this.degree - degree;
-    let radian = deg2rad(degree);
-
-    debug('CURRENT POSX: ', this.posX);
-    debug('CURRENT POSY: ', this.posY);
-    let translateX = this.posX + TURTLE_IMG_WIDTH;
-    let translateY = this.posY;
-    debug('TRANSLATE X: ', translateX);
-    debug('TRANSLATE Y: ', translateY);
+    let rounded = roundDegree(degree);
+    this.degree = this.degree - rounded;  
+    let translateX = this.posX + this.imgOriginX;
+    let translateY = this.posY + this.imgOriginY;
     this.ctx.save();
 
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     this.ctx.translate(translateX, translateY);
-    this.ctx.rotate(radian);
+    this.ctx.rotate(deg2rot(this.degree));
     this.ctx.translate(-translateX, -translateY);
-    this.ctx.drawImage(this.cacheImg, translateX, translateY);
+    this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
 
     this.ctx.restore();
 
   }
 
   public rotateLeft(degree : number) {
-    this.degree = this.degree + degree;
-    let radian = deg2rad(this.degree);
+
+    debug('------ ROTATE LEFT ------');
+    let rounded = roundDegree(degree);
+    this.degree = this.degree + rounded;
+    let translateX = this.posX + this.imgOriginX;
+    let translateY = this.posY + this.imgOriginY;
     this.ctx.save();
+
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.ctx.rotate(-radian);
+    this.ctx.translate(translateX, translateY);
+    this.ctx.rotate(deg2rot(this.degree, true));
+    this.ctx.translate(-translateX, -translateY);
     this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
+
     this.ctx.restore();
   }
 
