@@ -26,22 +26,22 @@ export function deg2rad(degree : number) : number {
 }
 
 
-export function deg2rot(degree : number, isReverse : boolean = false) : number {
-  const fixedAngle = 90;
-  let actual = ( (360 - fixedAngle) - degree ) / 180 * Math.PI;
+export function deg2rot(degree : number) : number {
+  const radian = deg2rad(( 360 - reduceDegree(degree) + 180 ));
   debug('DEGREE: ', degree);
-  debug('ACTUAL: ', actual);
-  let rotate = actual >= Math.PI ? actual - Math.PI : actual;
-  return isReverse ? -rotate : rotate;
+  debug('RADIAN: ', radian);
+  const rotate = radian >= Math.PI ? radian - Math.PI : radian;
+  debug('ROTATE: ', rotate);
+  return rotate;
 }
 
 /**
- * 入力された度数(degree)を適正な範囲に丸める
+ * 入力された度数(degree)を適正な範囲に縮小する。
  * 0 ~ 359まで。360度は0度とみなす。
  */
-export function roundDegree(degree : number) : number {
+export function reduceDegree(degree : number) : number {
   if (degree < 360) { return degree; }
 
-  let rounded = degree - 360;
-  return roundDegree(rounded);
+  const rounded = degree - 360;
+  return reduceDegree(rounded);
 }

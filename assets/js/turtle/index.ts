@@ -1,11 +1,11 @@
-import { Point2d, deg2rad, deg2rot, roundDegree } from '../utils/index';
+import { Point2d, deg2rad, deg2rot, reduceDegree } from '../utils/index';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants/index';
 import * as Debug from 'debug';
 const debug = Debug('Logotron:Turtle');
 
 const TURTLE_IMG_WIDTH = 30;
 const TURTLE_IMG_HEIGHT = 30;
-const TURTLE_IMG_PATH = 'assets/image/kame.png';
+const TURTLE_IMG_PATH = 'assets/image/kame_yoko.png';
 
 export class Turtle {
 
@@ -24,26 +24,36 @@ export class Turtle {
 
   public constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
+    this.initialize();
+  }
+
+  public initialize() {
+
     this.posX = this.origin.x = (CANVAS_WIDTH / 2) - (TURTLE_IMG_WIDTH / 2);
     this.posY = this.origin.y = (CANVAS_HEIGHT / 2) - (TURTLE_IMG_HEIGHT / 2);
     this.imgOriginX = (TURTLE_IMG_WIDTH / 2);
     this.imgOriginY = (TURTLE_IMG_HEIGHT / 2);
+    this.degree = 90;
+    this.posX = this.origin.x;
+    this.posY = this.origin.y;
     this.degree = 90;
 
     const img = new Image();
     img.src = TURTLE_IMG_PATH;
     img.onload = (e) => {
       this.cacheImg = img;
-      this.ctx.drawImage(img, this.posX, this.posY);
-    };
-  }
+      this.ctx.save();
 
-  public initialize() {
-    this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.posX = this.origin.x;
-    this.posY = this.origin.y;
-    this.degree = 90;
-    this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
+      this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      let translateX = this.origin.x + this.imgOriginX;
+      let translateY = this.origin.y + this.imgOriginY;
+      this.ctx.translate(translateX, translateY);
+      this.ctx.rotate(deg2rot(this.degree));
+      this.ctx.translate(-translateX, -translateY);
+      this.ctx.drawImage(img, this.posX, this.posY);
+
+      this.ctx.restore();
+    };
   }
 
 
@@ -69,10 +79,7 @@ export class Turtle {
 
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     this.ctx.translate(translateX, translateY);
-    debug('RADIAN: ', this.degree);
-    debug('ANGLE: ', deg2rot(this.degree));
-    let isReverse = this.degree > 0;
-    this.ctx.rotate(deg2rot(this.degree, isReverse));
+    this.ctx.rotate(deg2rot(this.degree));
     this.ctx.translate(-translateX, -translateY);
     this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
 
@@ -87,7 +94,7 @@ export class Turtle {
   public rotateRight(degree : number) {
 
     debug('------ ROTATE RIGHT ------');
-    let rounded = roundDegree(degree);
+    let rounded = reduceDegree(degree);
     this.degree = this.degree - rounded;  
     let translateX = this.posX + this.imgOriginX;
     let translateY = this.posY + this.imgOriginY;
@@ -106,7 +113,7 @@ export class Turtle {
   public rotateLeft(degree : number) {
 
     debug('------ ROTATE LEFT ------');
-    let rounded = roundDegree(degree);
+    let rounded = reduceDegree(degree);
     this.degree = this.degree + rounded;
     let translateX = this.posX + this.imgOriginX;
     let translateY = this.posY + this.imgOriginY;
@@ -114,7 +121,7 @@ export class Turtle {
 
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     this.ctx.translate(translateX, translateY);
-    this.ctx.rotate(deg2rot(this.degree, true));
+    this.ctx.rotate(deg2rot(this.degree));
     this.ctx.translate(-translateX, -translateY);
     this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
 
