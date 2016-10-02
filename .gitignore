@@ -4,3 +4,5 @@ node_modules
 assets/js/**/*.js
 assets/js/**/*.map
 assets/js/**/*.d.ts
+
+.DS_Store
