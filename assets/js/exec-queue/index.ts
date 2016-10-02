@@ -1,3 +1,5 @@
+import * as Debug from 'debug';
+
 export class ExecQueue {
   private queue: Array<Function> = [];
   public constructor () {

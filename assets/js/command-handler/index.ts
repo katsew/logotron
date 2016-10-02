@@ -1,6 +1,7 @@
 import { Pen } from '../pen/index';
 import { Turtle } from '../turtle/index';
 import { ExecQueue } from '../exec-queue/index';
+import * as Debug from 'debug';
 
 const INPUT_COMMAND_REGEXP = /^(PU|PD|FD|BK|RT|LT)\((.*)\).*$/;
 export class CommandHandler {
@@ -25,31 +26,43 @@ export class CommandHandler {
   }
   public FD(length : string) {
     for (let i = 0; i < Number(length); ++i) {
-      this.callStack.enqueue(this.turtle.moveForward.bind(this.turtle, i));
-      this.callStack.enqueue(this.pen.moveForward.bind(this.pen, i));
+      const func = function(idx) {
+        this.turtle.moveForward.call(this.turtle, idx);
+        this.pen.moveForward.call(this.pen, idx);
+      }.bind(this, i);
+      this.callStack.enqueue(func);
     }
   }
   public BK(length : string) {
     for (let i = 0; i < Number(length); ++i) {
-      this.callStack.enqueue(this.turtle.moveBackward.bind(this.turtle, i));
-      this.callStack.enqueue(this.pen.moveBackward.bind(this.pen, i));
+      const func = function(idx) {
+        this.turtle.moveBackward.call(this.turtle, idx);
+        this.pen.moveBackward.call(this.pen, idx);
+      }.bind(this, i);
+      this.callStack.enqueue(func);
     }
   }
   public RT(degree : string) {
     const numberDegree = Number(degree);
-    this.callStack.enqueue(this.pen.rotateRight.bind(this.pen, numberDegree));
-    this.callStack.enqueue(this.turtle.rotateRight.bind(this.turtle, numberDegree));
+    const func = function(deg) {
+      this.turtle.rotateRight.call(this.turtle, deg);
+      this.pen.rotateRight.call(this.pen, deg);
+    }.bind(this, numberDegree);
+    this.callStack.enqueue(func);
   }
   public LT(degree : string) {
     const numberDegree = Number(degree);
-    this.callStack.enqueue(this.pen.rotateLeft.bind(this.pen, numberDegree));
-    this.callStack.enqueue(this.turtle.rotateLeft.bind(this.turtle, numberDegree));
+    const func = function(deg) {
+      this.turtle.rotateLeft.call(this.turtle, deg);
+      this.pen.rotateLeft.call(this.pen, deg);
+    }.bind(this, numberDegree);
+    this.callStack.enqueue(func);
   }
   public static getCommandName(str) {
-    return str.replace(INPUT_COMMAND_REGEXP, "$1");
+    return str.trim().replace(INPUT_COMMAND_REGEXP, "$1");
   }
   public static getCommandArgs(str) {
-    return str.replace(INPUT_COMMAND_REGEXP, "$2").split(',');
+    return str.trim().replace(INPUT_COMMAND_REGEXP, "$2").split(',');
   }
   public static parseCommands(commands : string) : Array<string> {
     if (commands === '' || commands.length < 1) return [];

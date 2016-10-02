@@ -1,5 +1,7 @@
 import { Point2d, deg2rad } from '../utils/index';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants/index';
+import * as Debug from 'debug';
+const debug = Debug('Logotron:Turtle');
 
 const TURTLE_IMG_WIDTH = 30;
 const TURTLE_IMG_HEIGHT = 30;
@@ -15,12 +17,17 @@ export class Turtle {
   };
   private posX : number = 0;
   private posY : number = 0;
-  private degree : number = 90; 
+  private degree : number = 90;
+
+  private imgOriginX : number = 0;
+  private imgOriginY : number = 0;
 
   public constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.posX = this.origin.x = (CANVAS_WIDTH / 2) - (TURTLE_IMG_WIDTH / 2);
     this.posY = this.origin.y = (CANVAS_HEIGHT / 2) - (TURTLE_IMG_HEIGHT / 2);
+    this.imgOriginX = (TURTLE_IMG_WIDTH / 2);
+    this.imgOriginY = (TURTLE_IMG_HEIGHT / 2);
     this.degree = 90;
 
     const img = new Image();
@@ -55,9 +62,16 @@ export class Turtle {
     let unitY = Math.sin(radian);
     this.posX = this.transformX(unitX * length);
     this.posY = this.transformY(unitY * length);
+    let translateX = this.posX + TURTLE_IMG_WIDTH;
+    let translateY = this.posY;
     this.ctx.save();
+
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    this.ctx.translate(translateX, translateY);
+    this.ctx.rotate(radian);
+    this.ctx.translate(-translateX, -translateY);
     this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
+
     this.ctx.restore();
 
   }
@@ -67,15 +81,27 @@ export class Turtle {
   }
 
   public rotateRight(degree : number) {
+
+    debug('------ ROTATE RIGHT ------');
     this.degree = this.degree === 0 ? 360 - degree : this.degree - degree;
     let radian = deg2rad(degree);
+
+    debug('CURRENT POSX: ', this.posX);
+    debug('CURRENT POSY: ', this.posY);
+    let translateX = this.posX + TURTLE_IMG_WIDTH;
+    let translateY = this.posY;
+    debug('TRANSLATE X: ', translateX);
+    debug('TRANSLATE Y: ', translateY);
     this.ctx.save();
+
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.ctx.translate(this.posX - (TURTLE_IMG_WIDTH / 2), this.posY - (TURTLE_IMG_HEIGHT / 2));
+    this.ctx.translate(translateX, translateY);
     this.ctx.rotate(radian);
-    this.ctx.translate(-this.posX - (TURTLE_IMG_WIDTH / 2), -this.posY - (TURTLE_IMG_HEIGHT / 2));
-    this.ctx.drawImage(this.cacheImg, this.posX, this.posY);
+    this.ctx.translate(-translateX, -translateY);
+    this.ctx.drawImage(this.cacheImg, translateX, translateY);
+
     this.ctx.restore();
+
   }
 
   public rotateLeft(degree : number) {
