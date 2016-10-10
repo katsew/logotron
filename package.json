@@ -1,7 +1,7 @@
 {
   "name": "logotron",
   "productName": "Logotron",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Have fun to learn LOGO programming with electron!",
   "license": "MIT",
   "repository": "katsew/logotron",
