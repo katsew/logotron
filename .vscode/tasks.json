@@ -2,10 +2,23 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "0.1.0",
-  "command": "tsc",
+  "command": "sh",
+  "args": ["-c"],
   "isShellCommand": true,
-  "args": ["-w", "-p", "."],
-  "showOutput": "silent",
-  "isWatching": true,
-  "problemMatcher": "$tsc-watch"
+  "showOutput": "always",
+  "suppressTaskName": true,
+  "tasks": [
+    {
+      "taskName": "tsc",
+      "args": ["tsc -w -p ."],
+      "isWatching": true,
+      "problemMatcher": "$tsc-watch",
+      "isTestCommand": true
+    },
+    {
+      "isBuildCommand": true,
+      "taskName": "browserify",
+      "args": ["browserify ./assets/js/main.js -o ./assets/js/bundle.js"]
+    }
+  ]
 }

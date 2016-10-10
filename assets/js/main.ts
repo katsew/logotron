@@ -1,206 +1,123 @@
-;(function() {
+import { Pen } from './pen/index';
+import { Turtle } from './turtle/index';
+import { ExecQueue } from './exec-queue/index';
+import { CommandHandler } from './command-handler/index';
+import { CodeRunner } from './code-runner/index';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from './constants/index';
 
-  'use strict';
+import * as Debug from 'debug';
+const debug = Debug('Logotron:Main');
 
-  const CANVAS_WIDTH = 1000;
-  const CANVAS_HEIGHT = 800;
-  const canvas = <HTMLCanvasElement>document.getElementById('c');
-  canvas.width = CANVAS_WIDTH;
-  canvas.height = CANVAS_HEIGHT;
-  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+const penCanvas = <HTMLCanvasElement>document.getElementById('p');
+const turtleCanvas = <HTMLCanvasElement>document.getElementById('t');
+penCanvas.width = turtleCanvas.width = CANVAS_WIDTH;
+penCanvas.height = turtleCanvas.height = CANVAS_HEIGHT;
+const penCanvasCtx = <CanvasRenderingContext2D>penCanvas.getContext('2d');
+const turtleCanvasCtx = <CanvasRenderingContext2D>turtleCanvas.getContext('2d');
+const textarea = <HTMLTextAreaElement>document.getElementById('editCommand');
+const buttonRun = <HTMLButtonElement>document.getElementById('buttonRun');
+const buttonReset = <HTMLButtonElement>document.getElementById('buttonReset');
+const turtle = new Turtle(turtleCanvasCtx);
+const pen = new Pen(penCanvasCtx);
+const callStack = new ExecQueue();
+const commandHandler = new CommandHandler(pen, turtle, callStack);
 
-  class Point2d {
-
-    public x;
-    public y;
-    public constructor(x : number, y : number) {
-      this.x = x;
-      this.y = y;
-    }
-
+let instance = null;
+buttonRun.addEventListener('click', function(e) {
+  
+  if (instance != null && instance.isRunning()) {
+    debug('Logo still running commands, isRunning', instance.isRunning);
+    return false;
   }
 
-  class CanvasHandler {
+  pen.initialize();
+  turtle.initialize();
 
-    private ctx: CanvasRenderingContext2D = null;
-    private origin: Point2d = {
-      x: 0,
-      y: 0
-    };
-    private posX: number = 0;
-    private posY: number = 0;
-    private degree: number = 90;
-    private queue: Array<Function> = [];
-    private isDrawable: boolean = true;
+  const inputs = textarea.value;
+  // const commands = CommandHandler.parseCommands(inputs);
+  // debug('Commands: ', commands);
+  // commands.filter(function(command) {
+  //   return command !== '' && command != null;
+  // }).forEach(function (command) {
+  //   let commandName = CommandHandler.getCommandName(command);
+  //   let commandArgs = CommandHandler.getCommandArgs(command);
+  //   try {
+  //     commandHandler.register(commandName, commandArgs);
+  //     debug('Command Name: ', commandName);
+  //     debug('Command Args', commandArgs);
+  //   } catch (e) {
+  //     console.warn(e.name);
+  //     console.warn(e.message);
+  //   }
+  // });
+  // const codeRunner = new CodeRunner(callStack, 30);
+  // instance = codeRunner;
+  // codeRunner.run();
 
-    public constructor(ctx : CanvasRenderingContext2D) {
-      this.ctx = ctx;
-      this.origin.x = CANVAS_WIDTH / 2;
-      this.origin.y = CANVAS_HEIGHT / 2;
-      this.posX = this.origin.x;
-      this.posY = this.origin.y;
+  /**
+   * Stop parse commands manually and create new function from string
+   * and evaluate it.
+   * To catch Exception like SyntaxError, use Promise#catch.
+   * 
+   * @todo Implement LOGO command parser 
+   */
+  const promise = new Promise((resolve, reject) => {
+
+    const execute = new Function(inputs);
+    try {
+      execute();
+    } catch (e) {
+      reject(e);
     }
+    resolve();
 
-    public run() {
+  });
+  debug(inputs);
+  promise.then(() => {
+    debug('=== RESOLVE PROMISE ===');
+  }).catch((e) => {
+    console.warn(e);
+  });
 
-      this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      this.posX = this.origin.x;
-      this.posY = this.origin.y;
-      this.ctx.moveTo(this.posX, this.posY);
+}, false);
 
-      const stackSize = this.queue.length;
-      console.log('command stack size: ', stackSize);
-      for (let i = 0; i < stackSize; ++i) {
-        this.dequeue()();
-      }
+buttonReset.addEventListener('click', function() {
+  (<any>window).RESET();
+});
 
-      console.log('--- finish exec command, stroke it ---');
-      this.ctx.stroke();
-    }
-
-    private transformX(x : number) : number {
-      return this.posX + x;
-    }
-
-    private transformY(y : number) : number {
-      return this.posY - y;
-    }
-
-    public enqueue(func) {
-      this.queue.push(func);
-    }
-
-    public dequeue() : Function {
-      return this.queue.shift();
-    }
-
-    public setDrawableTo(isDrawable : boolean) : void {
-      this.isDrawable = isDrawable;
-      console.log('set isDrawable to : ', this.isDrawable);
-    }
-
-    public moveForward(length : number) {
-
-      let radian = deg2rad(this.degree);
-      this.posX = this.transformX(Math.cos(radian) * length);
-      this.posY = this.transformY(Math.sin(radian) * length);
-
-      if (this.isDrawable) {
-        this.ctx.lineTo(this.posX, this.posY);
-      } else {
-        this.ctx.moveTo(this.posX, this.posY);
-      }
-
-      console.log('move to :', this.posX, this.posY);
-
-    }
-
-    public moveBackward(length : number) {
-      this.moveForward(-length);
-    }
-
-    public rotateRight(degree : number) {
-      this.degree = this.degree - degree;
-      console.log('rotate right: ', this.degree);
-    }
-
-    public rotateLeft(degree : number) {
-      this.degree = this.degree + degree;
-      console.log('rotate left: ', this.degree);
-    }
-
-  }
-
-  const INPUT_PARSE_REGEXP = /^(PU|PD|FD|BK|RT|LT)\((.*)\).*$/;
-  class InputHandler {
-
-    private handler: CanvasHandler;
-
-    public constructor(c : CanvasHandler) {
-      this.handler = c;
-    }
-    public PU() {
-      console.log('--- input command: pen up ---');
-      this.handler.enqueue(this.handler.setDrawableTo.bind(this.handler, false));
-    }
-    public PD() {
-      console.log('--- input command: pen down ---');
-      this.handler.enqueue(this.handler.setDrawableTo.bind(this.handler, true));
-    }
-    public FD(length : string) {
-      console.log('--- input command: forward ---');
-      this.handler.enqueue(this.handler.moveForward.bind(this.handler, parseInt(length, 10)));
-    }
-    public BK(length : string) {
-      console.log('--- input command: backward ---');
-      this.handler.enqueue(this.handler.moveBackward.bind(this.handler, parseInt(length, 10)));
-    }
-    public RT(degree : string) {
-      console.log('--- input command: rotate right ---');
-      this.handler.enqueue(this.handler.rotateRight.bind(this.handler, parseInt(degree, 10)));
-    }
-    public LT(degree : string) {
-      console.log('--- input command: rotate left ---');
-      this.handler.enqueue(this.handler.rotateLeft.bind(this.handler, parseInt(degree, 10)));
-    }
-    public static getCommandName(str) {
-      return str.replace(INPUT_PARSE_REGEXP, "$1");
-    }
-    public static getCommandArgs(str) {
-      return str.replace(INPUT_PARSE_REGEXP, "$2").split(',');
-    }
-  }
-
-  const textarea = <HTMLTextAreaElement>document.getElementById('editCommand');
-  const button = <HTMLButtonElement>document.getElementById('buttonRun');
-
-  button.addEventListener('click', function(e) {
-
-    const canvasHandler = new CanvasHandler(ctx);
-    const inputHandler = new InputHandler(canvasHandler);
-
-    const inputs = textarea.value;
-    const commands = parseCommands(inputs);
-    console.log(commands);
-    commands.filter(function(command) {
-      return command !== '' && command != null;
-    }).forEach(function (command) {
-      let commandName = InputHandler.getCommandName(command);
-      let commandArgs = InputHandler.getCommandArgs(command);
-      try {
-        inputHandler[commandName].apply(inputHandler, commandArgs);
-        console.log(commandName);
-        console.log(commandArgs);
-      } catch (e) {
-        console.warn(e.name);
-        console.warn(e.message);
-      }
-    });
-
-    console.log('--- finish enqueue commands ---');
-    canvasHandler.run();
-
-  }, false);
-
-  function parseCommands(commands : string) : Array<string> {
-
-    if (commands === '' || commands.length < 1) return [];
-    const parsed = commands.split(/\r\n|\r|\n/);
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-    return [];
-
-  }
-
-  function deg2rad(degree : number) : number {
-
-    // 半径を1としたときの直径は2でその円周の長さは2 * 1 * Math.PI
-    // したがって、弧度法で測った場合の角度degreeは degree / 360 * 2 * 1 * Math.PI
-    let radian = degree / 180 * Math.PI;
-    console.log(radian);
-    return radian;
-
-  }
-
-})();
+/**
+ * Add REPL command line interface
+ * (cmd + i) to open dev tool and run commands below.
+ * 
+ * @todo Classify
+ */
+(<any>window).INSTANCE = new CodeRunner(callStack, 30);
+(<any>window).RESET = function() {
+  debug('=== RESET PEN AND TURTLE ===');
+  pen.initialize();
+  turtle.initialize();
+};
+(<any>window).FD = function(length: string) {
+  commandHandler.FD(length);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).BK = function(length: string) {
+  commandHandler.BK(length);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).RT = function(degree: string) {
+  commandHandler.RT(degree);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).LT = function(degree: string) {
+  commandHandler.LT(degree);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).PU = function() {
+  commandHandler.PU();
+  (<any>window).INSTANCE.run();
+};
+(<any>window).PD = function() {
+  commandHandler.PD();
+  (<any>window).INSTANCE.run();
+};

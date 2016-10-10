@@ -1,5 +1,8 @@
 node_modules
 /dist
 
-assets/js/*.js
-assets/js/*.map
+assets/js/**/*.js
+assets/js/**/*.map
+assets/js/**/*.d.ts
+
+.DS_Store

@@ -1,15 +1,32 @@
-# logotron
+# Logotron
 
-> My amazing app
+Have fun to learn LOGO programming with electron!
 
+# Dev Requirements
+
+- Node.js (v4.x.x)
+- Electron
+- TypeScript (2.x)
+- Browserify
 
 ## Dev
+
+```
+$ npm install -g typescript@2.0 browserify
+```
 
 ```
 $ npm install
 ```
 
 ### Run
+
+ 
+```
+$ npm run bundle
+```
+
+then
 
 ```
 $ npm start
