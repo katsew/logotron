@@ -2,7 +2,7 @@
   "name": "logotron",
   "productName": "Logotron",
   "version": "0.0.0",
-  "description": "My amazing app",
+  "description": "Have fun to learn LOGO programming with electron!",
   "license": "MIT",
   "repository": "katsew/logotron",
   "author": {
