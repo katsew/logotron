@@ -65,19 +65,34 @@ body {
 
 .button {
   position: absolute;
-  right: 20px;
-  bottom: 20px;
-  z-index: 10001;
   width: 100px;
   height: 30px;
   line-height: 1;
   font-weight: bold;
-  background-color: mediumseagreen;
-  border: 1px solid seagreen;
   outline: none;
-  transition: background-color 0.25s ease 0s;
   cursor: pointer;
 }
-.button:hover {
+
+.button.run {
+  right: 20px;
+  bottom: 20px;
+  z-index: 10001;
+  background-color: mediumseagreen;
+  border: 1px solid seagreen;
+  transition: background-color 0.25s ease 0s;
+}
+.button.run:hover {
   background-color: seagreen;
+}
+
+.button.reset {
+  right: 150px;
+  bottom: 20px;
+  z-index: 10002;
+  background-color: lightskyblue;
+  border: 1px solid dodgerblue;
+  transition: background-color 0.25s ease 0s;
+}
+.button.reset:hover {
+  background-color: dodgerblue;
 }

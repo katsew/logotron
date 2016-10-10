@@ -15,14 +15,15 @@ penCanvas.height = turtleCanvas.height = CANVAS_HEIGHT;
 const penCanvasCtx = <CanvasRenderingContext2D>penCanvas.getContext('2d');
 const turtleCanvasCtx = <CanvasRenderingContext2D>turtleCanvas.getContext('2d');
 const textarea = <HTMLTextAreaElement>document.getElementById('editCommand');
-const button = <HTMLButtonElement>document.getElementById('buttonRun');
+const buttonRun = <HTMLButtonElement>document.getElementById('buttonRun');
+const buttonReset = <HTMLButtonElement>document.getElementById('buttonReset');
 const turtle = new Turtle(turtleCanvasCtx);
 const pen = new Pen(penCanvasCtx);
 const callStack = new ExecQueue();
 const commandHandler = new CommandHandler(pen, turtle, callStack);
 
 let instance = null;
-button.addEventListener('click', function(e) {
+buttonRun.addEventListener('click', function(e) {
   
   if (instance != null && instance.isRunning()) {
     debug('Logo still running commands, isRunning', instance.isRunning);
@@ -33,28 +34,56 @@ button.addEventListener('click', function(e) {
   turtle.initialize();
 
   const inputs = textarea.value;
-  const commands = CommandHandler.parseCommands(inputs);
-  debug('Commands: ', commands);
-  commands.filter(function(command) {
-    return command !== '' && command != null;
-  }).forEach(function (command) {
-    let commandName = CommandHandler.getCommandName(command);
-    let commandArgs = CommandHandler.getCommandArgs(command);
+  // const commands = CommandHandler.parseCommands(inputs);
+  // debug('Commands: ', commands);
+  // commands.filter(function(command) {
+  //   return command !== '' && command != null;
+  // }).forEach(function (command) {
+  //   let commandName = CommandHandler.getCommandName(command);
+  //   let commandArgs = CommandHandler.getCommandArgs(command);
+  //   try {
+  //     commandHandler.register(commandName, commandArgs);
+  //     debug('Command Name: ', commandName);
+  //     debug('Command Args', commandArgs);
+  //   } catch (e) {
+  //     console.warn(e.name);
+  //     console.warn(e.message);
+  //   }
+  // });
+  // const codeRunner = new CodeRunner(callStack, 30);
+  // instance = codeRunner;
+  // codeRunner.run();
+
+  /**
+   * Stop parse commands manually and create new function from string
+   * and evaluate it.
+   * To catch Exception like SyntaxError, use Promise#catch.
+   * 
+   * @todo Implement LOGO command parser 
+   */
+  const promise = new Promise((resolve, reject) => {
+
+    const execute = new Function(inputs);
     try {
-      commandHandler.register(commandName, commandArgs);
-      debug('Command Name: ', commandName);
-      debug('Command Args', commandArgs);
+      execute();
     } catch (e) {
-      console.warn(e.name);
-      console.warn(e.message);
+      reject(e);
     }
+    resolve();
+
+  });
+  debug(inputs);
+  promise.then(() => {
+    debug('=== RESOLVE PROMISE ===');
+  }).catch((e) => {
+    console.warn(e);
   });
 
-  const codeRunner = new CodeRunner(callStack, 30);
-  instance = codeRunner;
-  codeRunner.run();
-
 }, false);
+
+buttonReset.addEventListener('click', function() {
+  (<any>window).RESET();
+});
 
 /**
  * Add REPL command line interface
@@ -64,6 +93,7 @@ button.addEventListener('click', function(e) {
  */
 (<any>window).INSTANCE = new CodeRunner(callStack, 30);
 (<any>window).RESET = function() {
+  debug('=== RESET PEN AND TURTLE ===');
   pen.initialize();
   turtle.initialize();
 };
