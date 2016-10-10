@@ -14,6 +14,8 @@
     "test": "xo",
     "start": "electron .",
     "build": "electron-packager . --out=dist --asar --overwrite --all",
+    "build:win": "electron-packager . --out=dist --asar --overwrite --platform=win32",
+    "build:mac": "electron-packager . --out=dist --asar --overwrite --platform=darwin",
     "bundle": "tsc -p . && browserify ./assets/js/main.js -o ./assets/js/bundle.js"
   },
   "files": [
