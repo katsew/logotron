@@ -4,8 +4,9 @@ Have fun to learn LOGO programming with electron!
 
 # Dev Requirements
 
+- Node.js (v4.x.x)
 - Electron
-- TypeScript (2.0)
+- TypeScript (2.x)
 - Browserify
 
 ## Dev
