@@ -55,3 +55,39 @@ button.addEventListener('click', function(e) {
   codeRunner.run();
 
 }, false);
+
+/**
+ * Add REPL command line interface
+ * (cmd + i) to open dev tool and run commands below.
+ * 
+ * @todo Classify
+ */
+(<any>window).INSTANCE = new CodeRunner(callStack, 30);
+(<any>window).RESET = function() {
+  pen.initialize();
+  turtle.initialize();
+};
+(<any>window).FD = function(length: string) {
+  commandHandler.FD(length);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).BK = function(length: string) {
+  commandHandler.BK(length);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).RT = function(degree: string) {
+  commandHandler.RT(degree);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).LT = function(degree: string) {
+  commandHandler.LT(degree);
+  (<any>window).INSTANCE.run();
+};
+(<any>window).PU = function() {
+  commandHandler.PU();
+  (<any>window).INSTANCE.run();
+};
+(<any>window).PD = function() {
+  commandHandler.PD();
+  (<any>window).INSTANCE.run();
+};
