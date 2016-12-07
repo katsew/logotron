@@ -1,9 +1,13 @@
 import { Pen } from '../pen/index';
 import { Turtle } from '../turtle/index';
 import { ExecQueue } from '../exec-queue/index';
+import * as LogoCommandParser from 'logo-command-parser';
 import * as Debug from 'debug';
 
-const INPUT_COMMAND_REGEXP = /^(PU|PD|FD|BK|RT|LT)\((.*)\).*$/;
+interface LogoCommand {
+  command: string,
+  args: Array<any>
+}
 export class CommandHandler {
 
   private pen : Pen;
@@ -58,15 +62,9 @@ export class CommandHandler {
     }.bind(this, numberDegree);
     this.callStack.enqueue(func);
   }
-  public static getCommandName(str) {
-    return str.trim().replace(INPUT_COMMAND_REGEXP, "$1");
-  }
-  public static getCommandArgs(str) {
-    return str.trim().replace(INPUT_COMMAND_REGEXP, "$2").split(',');
-  }
-  public static parseCommands(commands : string) : Array<string> {
+  public static parseCommands(commands : string) : Array<LogoCommand> {
     if (commands === '' || commands.length < 1) return [];
-    const parsed = commands.split(/\r\n|\r|\n/);
+    const parsed = LogoCommandParser.parse(commands);
     if (Array.isArray(parsed)) {
       return parsed;
     }

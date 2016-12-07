@@ -1,7 +1,7 @@
 {
   "name": "logotron",
   "productName": "Logotron",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Have fun to learn LOGO programming with electron!",
   "license": "MIT",
   "repository": "katsew/logotron",
@@ -25,10 +25,17 @@
   ],
   "keywords": [
     "electron-app",
-    "electron"
+    "electron",
+    "LOGO",
+    "turtle graphics",
+    "education",
+    "computer graphics",
+    "html5",
+    "canvas"
   ],
   "dependencies": {
-    "electron-debug": "^1.0.0"
+    "electron-debug": "^1.0.0",
+    "logo-command-parser": "^0.2.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.29",
