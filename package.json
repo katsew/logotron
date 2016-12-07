@@ -25,7 +25,13 @@
   ],
   "keywords": [
     "electron-app",
-    "electron"
+    "electron",
+    "LOGO",
+    "turtle graphics",
+    "education",
+    "computer graphics",
+    "html5",
+    "canvas"
   ],
   "dependencies": {
     "electron-debug": "^1.0.0",
