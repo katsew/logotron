@@ -28,7 +28,8 @@
     "electron"
   ],
   "dependencies": {
-    "electron-debug": "^1.0.0"
+    "electron-debug": "^1.0.0",
+    "logo-command-parser": "^0.2.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.29",

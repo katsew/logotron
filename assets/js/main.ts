@@ -34,50 +34,23 @@ buttonRun.addEventListener('click', function(e) {
   turtle.initialize();
 
   const inputs = textarea.value;
-  // const commands = CommandHandler.parseCommands(inputs);
-  // debug('Commands: ', commands);
-  // commands.filter(function(command) {
-  //   return command !== '' && command != null;
-  // }).forEach(function (command) {
-  //   let commandName = CommandHandler.getCommandName(command);
-  //   let commandArgs = CommandHandler.getCommandArgs(command);
-  //   try {
-  //     commandHandler.register(commandName, commandArgs);
-  //     debug('Command Name: ', commandName);
-  //     debug('Command Args', commandArgs);
-  //   } catch (e) {
-  //     console.warn(e.name);
-  //     console.warn(e.message);
-  //   }
-  // });
-  // const codeRunner = new CodeRunner(callStack, 30);
-  // instance = codeRunner;
-  // codeRunner.run();
-
-  /**
-   * Stop parse commands manually and create new function from string
-   * and evaluate it.
-   * To catch Exception like SyntaxError, use Promise#catch.
-   * 
-   * @todo Implement LOGO command parser 
-   */
-  const promise = new Promise((resolve, reject) => {
-
-    const execute = new Function(inputs);
+  const commands = CommandHandler.parseCommands(inputs);
+  debug('Commands: ', commands);
+  commands.filter(function(command) {
+    return command != null;
+  }).forEach(function (command) {
     try {
-      execute();
+      commandHandler.register(command.command, command.args);
     } catch (e) {
-      reject(e);
+      console.warn(e.name);
+      console.warn(e.message);
     }
-    resolve();
+  });
+  const codeRunner = new CodeRunner(callStack, 30);
+  instance = codeRunner;
+  codeRunner.run();
 
-  });
-  debug(inputs);
-  promise.then(() => {
-    debug('=== RESOLVE PROMISE ===');
-  }).catch((e) => {
-    console.warn(e);
-  });
+
 
 }, false);
 
