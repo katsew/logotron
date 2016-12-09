@@ -1,6 +1,8 @@
 # Logotron
 
-Have fun to learn LOGO programming with electron!
+Have fun to learn LOGO programming with electron!  
+
+![Demo](https://raw.githubusercontent.com/katsew/logotron/develop/assets/image/demo.gif)
 
 # Dev Requirements
 
