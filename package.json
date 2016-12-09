@@ -35,7 +35,7 @@
   ],
   "dependencies": {
     "electron-debug": "^1.0.0",
-    "logo-command-parser": "^0.2.0"
+    "logo-command-parser": "^0.3.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.29",
