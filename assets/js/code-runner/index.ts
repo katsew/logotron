@@ -49,7 +49,7 @@ export class CodeRunner {
 
     } else {
       debug('=== Not inside a frame');
-      debug(`delta: ${now, this.lastTimeMilli}`);
+      debug(`delta: ${now}, ${this.lastTimeMilli}`);
       this.animationId = requestAnimationFrame(this.boundMainFunc);
     }
 
