@@ -19,7 +19,8 @@
     "build": "electron-packager . --out=dist --asar --overwrite --all",
     "build:win": "electron-packager . --out=dist --asar --overwrite --platform=win32",
     "build:mac": "electron-packager . --out=dist --asar --overwrite --platform=darwin",
-    "bundle": "tsc -p . && browserify ./assets/js/main.js -o ./assets/js/bundle.js"
+    "bundle": "tsc -p . && browserify ./assets/js/main.js -o ./assets/js/bundle.js",
+    "host": "npm run bundle && mkdir -p ./public/assets/{js,image} && cp index.* ./public/ && cp ./assets/js/bundle.js ./public/assets/js/bundle.js && cp -r ./assets/image ./public/assets/"
   },
   "files": [
     "index.js",
