@@ -4,11 +4,14 @@
   "version": "0.4.0",
   "description": "Have fun to learn LOGO programming with electron!",
   "license": "MIT",
+  "engines": {
+    "node": ">=10.15.1",
+    "npm": ">=6.4.1"
+  },
   "repository": "katsew/logotron",
   "author": {
     "name": "katsew",
-    "email": "y.katsew@gmail.com",
-    "url": "katsew.github.io"
+    "email": "y.katsew@gmail.com"
   },
   "scripts": {
     "test": "xo",
