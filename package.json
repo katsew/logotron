@@ -46,7 +46,7 @@
     "browserify": "^16.2.3",
     "debug": "^2.2.0",
     "devtron": "^1.1.0",
-    "electron": "^4.0.4",
+    "electron": "^13.6.6",
     "electron-packager": "^13.0.1",
     "typescript": "^2.0.3",
     "xo": "^0.24.0"
